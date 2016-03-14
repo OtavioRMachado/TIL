@@ -1,0 +1,18 @@
+"Can Programming Be Liberated from the Von Neumann Style? A Functional Style and Its Algebra of Programs", by John Backus (available at http://www.thocp.net/biographies/papers/backus_turingaward_lecture.pdf)
+
+I started reading an article about the problems we have from Von Neumann Languages.
+        A Von Neumann architecture is an architecture based on three components: A Central Processing Unit (CPU),  a Storage Unit (Memory) and a channel of communication between them, that the author calls the "Von Neumann bottleneck", because all operations inside a machine involve passing information from one another, that often require more information to be passed through one another, in vicious cycle. 
+        A Von Neumann Language is a language that has its bases in the same principles, having variables as the storage cells, control statements for the test-and-jump instructions, assignment statements for the fetching and storing instructions and expressions for memory reference and arithmethic.
+        The author remembers the bottleneck from the architecture and questions whether our computing-ability has not increased as fast as we expected because we start creating new languages that are kind of copies from the previous ones, and not started questioning their key concepts in the process.
+        
+        There are three kinds of language models. They are clustered upon the following reasonings:
+        - Foundation
+        - History Sensitivity
+        - Type of Semantics
+        - Clarity and Conceptual Usefulness of Programs
+        The three types are:
+        - Simple Operational Models, like the Turing Machine;
+        - Applicative Models, like Functional Programming Systems;
+        - Von Neumann Models, like the Conventional Programming Languages we use;
+
+(stopped at 5. Comparison of Von Neumann and Functional Programs)

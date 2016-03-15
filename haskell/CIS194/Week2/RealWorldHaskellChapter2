@@ -1,0 +1,25 @@
+Abstraction - Adds meaning to plain bytes
+"A programming language's type system deeply colours the way we thing, and write code, in that language."
+STRONG, STATIC, INFERRED
+
+Strong type system -> It's not a permissive type system. There are no automatic coercions/conversions, and errors are raised if we try using an attribute of one type when another type was being expected.
+Static typing -> Means that the compiler will know the type of every value and expression at compile time, before the execution. This makes the programmers think a little bit more before writing code, but also eliminates the most simple and common erros that can happen in dinamically typed languages.
+
+Having both Strong type system and Static typing, Haskell makes it impossible for type errors to occur at runtime.
+
+Type inference -> Means that Haskell can automatically deduce the types of almost all expressions in a program.
+
+Char - Unicode character
+Bool - Value in boolean logic
+Int - Signed, fixed width integer values.
+Integer - Signed unbounded size
+Double - Floating point numbers
+Float - narrower type when compared to Double
+
+'a' :: Char (type signature)
+
+head [1,2,3,4]
+1
+
+tail [1,2,3,4]
+[2,3,4]

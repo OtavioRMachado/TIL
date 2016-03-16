@@ -1,0 +1,49 @@
+Locust
+
+Locust is a load testing tool where a swarm of locusts will attack the endpoint you're testing.
+You can define the behavior of each locust. 
+The process of testing is monitored from a web UI in real-time.
+It's completely event-based, so you can support thousands of concurrent users on a single machine.
+It does not use callbacks. Instead, uses light-weight processes, through gevent.
+
+Features
+- Write code in plain-old Python
+- Distributed & Scalable
+- Web-based UI
+- Can test any system
+- Hackable
+
+Why?
+JMeter has point-and-click interface, each user is a thread - what makes benchmarking thousands of users on a single machine not feasible.
+
+Writing a locustfile
+        A locustfile is a normal python file. The only requirement is that it declares at least one class - let's call it the locust class - that inherits from the class Locust.
+
+The Locust class represents one user. Locust will start one instance of the locust class for each user being simulated. There are a few attributes that a locust class SHOULD typically define:
+
+The task_set attribute
+        The task_set attribute should point to a TaskSet class, which defines the behaviour of the user.
+
+The min_wait and max_wait attributes
+        The default is 1 second.
+
+The weight attribute - that defines which request is more likely to be done.
+
+The host attribute
+        You can define a host in the locust class. It will be used when no host is specified on the command line.
+
+TaskSet
+        Represents the brain of a locust. Each Locust class must have a task_set attribute set, that points to a TaskSet.
+
+Declaring tasks
+
+from locust import Locust, TaskSet, task
+
+class MyTaskSet(TaskSet):
+        @task
+        def my_task(self):
+                print "Locust instance (%r) executing my_task" % (self.locust)
+
+class MyLocust(Locust):
+        task_set = MyTaskSet
+

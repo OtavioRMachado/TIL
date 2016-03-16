@@ -1,0 +1,29 @@
+There's a hierarchy on where to get the properties and attributes from. (It starts by command line and goes until Spring default properties, but there are like 10 levels of hierarchy, passing through SPRING_APPLICATION_JSON, .properties files and etc.)
+
+The SPRING_APPLICATION_JSON can be supplied via command-line with an environment variable.
+You can also set the JSON ina system argument or a command-line argument, or even as a JNDI (Java Naming and Directory Interface) variable.
+
+You can generate random values in the property files using the RandomValuePropertySource
+        example: my.secret = ${random.value}
+        (instead of value, you can use int, long, int(MAX) or int[MIN,MAX])
+
+By default, springboot will convert any command line option starting by '--' to a property and add it to the Spring environment.
+
+SpringApplication will look for an application.properties file and load it automatically (you can also use YAML)
+You can change the properties file name specifying a spring.config.name environment property and change its location with spring.config.location.
+
+Profile Specific files: 
+        application-{profile}.properties - If no profiles are explicitely ativated, then properties from application-default.properties are loaded.
+        To activate a profile, use spring.profiles.active property.
+
+Placeholders
+        You can reause values set before in your new property
+        app.name = MyApp
+        app.description = ${app.name} is a Spring Boot application.
+
+Using YAML
+        SpringApplication will automatically support YAML as an alternative if you have the SnakeYAML library on your classpath (spring-boot-starter starter pom already adds this library as a dependency)
+        To set multiple profiles in YAML, use spring.profiles attribute.
+        YAML CAN'T be loaded using @PropertySource annotation. To load values that way, you will need a properties file.
+
+STOPPED AT: Type safe config properties.

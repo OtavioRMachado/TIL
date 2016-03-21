@@ -1,0 +1,16 @@
+Chapter 1. The Architecture Business Cycle.
+"Simply stated, competitive success flows to the company that manages to establish proprietary architectural control over a broad, fast-moving, competitive space".
+
+Antes, o pessoal só construia sistemas baseado em requisitos técnicos, escritos em um documento. 
+Arquitetura de software engloba as estruturas de grandes sistemas de software. A visão arquitetural de um sistema é abstrata, ignora detalhes de implementação, algoritmos e representação de dados, e se concentra apenas no comportamento e interação de elementos "caixa preta". É o primeiro passo para desenhar um sistema que tenha um conjunto de propriedades desejadas. 
+
+DEFINIÇÃO: "A arquitetura de software de um programa ou sistema computacional é a estrutura, ou estruturas, do sistema, que engloba elementos de software, as propriedades externamente visíveis destes elementos, e as relações entre eles."
+
+Objetivos de organização geram requisitos, que geram uma arquitetura, que gera um sistema. A arquitetura flui a partir da experiência do arquiteto, e o ambiente técnico do momento. 
+Arquitetura de Sfotware é um resultado de influências técnicas, de negócio e sociais. Sua existência, por sua vez, afeta os ambientes técnico, de negócio e social, que subsequentemente influenciam futuras arquiteturas. Isso é chamado de CICLO DE INFLUÊNCIAS, do ambiente para a arquitetura e de volta para o ambiente. O Ciclo de negócio da arquitetura 
+
+Arquiteturas são influenciadas pelos interessados (stakeholders) do sistema.
+Stakeholders: Cliente, usuários finais, desenvolvedores, gerentes de projeto, mantenedores e até vendedores.
+
+(Parei em 1.2)
+

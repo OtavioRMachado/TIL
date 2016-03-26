@@ -1,0 +1,29 @@
+Consider static factory methods instead of constructors.
+example: 
+public static Boolean valueOf(boolean b) {
+        return b ? Boolean.TRUE : Boolean.FALSE;
+}
+
+Advantages:
+1. They have names: This means that it improves readability. If you have multiple ways of creating an object, it's best if you relate each way of creating it with a different name than just with a set of parameters that should be passed to the constructor.
+2. They don't always have to create a new object when they are called: Whenever you call a constructor, you will ALWAYS create a new object. If you use a static factory method, you have the choice of just returning an existing instance - if it is what is being asked - of that object. Imagine you need to create two $5 dollar bills. You don't need to create two different objects for that - if they are value objects - you can return the same instance of that $5 bill to both calls.
+3. They can return objects of any subtype of their return type: When you call a constructor, you will return an object of the constructor's type. If you use a factory method and you have a subclass for the class you're creating a method, you can also return objects of that subtype.
+4. They reduce the verbosity of creating parameterized type instances. 
+
+Disadvantages:
+1. Classes that provide only static factory methods - without constructors - cannot be subclassed. This could be a blessing in disguise, as it encourages programmers to use composition instead of inhearitance.
+2. They are not distinguishable from other static methods - so you don't know which ones are the constructors and which ones are not.
+
+In summary, static factory methods and public constructors BOTH have their uses, and it pays to understand their relative merits.
+OFTEN, FACTORIES ARE PREFERABLE, so avoid the reflex to provide public constructors WITHOUT FIRS CONSIDERING STATIC FACTORIES.
+
+Consider a builder when faced with many constructor parameters.
+Builder - Useful to create objects with various optional characters.
+Disadvantages: You have to create a builder to create an object. In performance-critical situations, this could be a problem. It is also more verbose.
+Telescoping constructor pattern - Another alternative, where you have multiple constructors. First one with all of the required parameters and then one more for each aditional parameter that is optional.
+Disadvantage: Lots of constructors. The more optional fields, the easier it gets out of hand. You still have to fill optional parameters with zeroes.
+JavaBeans pattern (setters) - When you have an empty constructor and setters for all parameters. 
+Disadvantage: You may have an object in an inconsistent state, you have to write lots of lines of code to set up your object. It also makes the class mutable. =(
+In summary: The builder pattern is a good choice when designing classes whose constructors or static factories would have more than a handful of parameters, especially if those parameters are optional.
+
+

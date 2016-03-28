@@ -1,3 +1,9 @@
+ITEMS:
+1. Consider static factory methods instead of constructors
+2. Consider a Builder when facing an object creation with multiple (optional) parameters
+3. Enforce the Singleton property with a private constructor or with an ENUM class
+4. Enforce noninstantiability with a private constructor
+
 Consider static factory methods instead of constructors.
 example: 
 public static Boolean valueOf(boolean b) {
@@ -26,4 +32,34 @@ JavaBeans pattern (setters) - When you have an empty constructor and setters for
 Disadvantage: You may have an object in an inconsistent state, you have to write lots of lines of code to set up your object. It also makes the class mutable. =(
 In summary: The builder pattern is a good choice when designing classes whose constructors or static factories would have more than a handful of parameters, especially if those parameters are optional.
 
+ENFORCE THE SINGLETON PROPERTY WITH A PRIVATE CONSTRUCTOR OR AN ENUM TYPE
 
+Singleton: A class that is instantiated exactly once.
+
+// Singleton with static factory
+public class Elvis {
+        private static final Elvis INSTANCE = new Elvis();
+        private Elvis() { ... }
+        public static Elvis getInstance() { return INSTANCE; }
+
+        public void leaveTheBuilding() { ... }
+}
+
+A Single-element enum type is the best way to implement a singleton.
+public enum Elvis {
+        INSTANCE;
+
+        public void leaveTheBuilding() { ... }
+}
+This works with serialization, is more concise.
+
+ENFORCE NONINSTANTIABILITY WITH A PRIVATE CONSTRUCTOR
+Having non instantiable classes is useful. You can join lots of methods and have an auxiliar class just like java.lang.Math. It's nonsensical to create a constructor for such classes, and if you don't define one, Java will, by default, define that there is a constructor that receives no arguments to build the object. If you make the class abstract, you can still subclass it. It's better to create a private constructor, to make sure that the class will not be able to instantiated.
+
+// Noninstantiable utility class
+public class UtilityClass {
+        // Suppress default constructor for noninstantiability
+        private UtilityClass() {
+                throw new AssertionError();
+        }
+        ... // Remainder omitted

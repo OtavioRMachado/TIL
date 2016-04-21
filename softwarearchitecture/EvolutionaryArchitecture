@@ -1,0 +1,11 @@
+Uma Evolutionary Architecture é uma arquitetura que segue características que permitem facilitar sua mudança depois de o projeto já ter começado. Historicamente, arquiteturas têm um alto custo de mudança. Existem um conjunto de técnicas que habilitam uma arquitetura a ser Evolutionary, como provisionamento de máquinas, testes e deploys automáticos (técnicas avançasdas de DEVOPS).
+A idéia geral é que, em uma arquitetura evolucionária/evolutiva, quando for necessário mudar um componente, possa-se mudá-lo assim como se muda uma peça de lego em uma construção.
+
+Características de uma "Evolutionary Architecture" (Arquitetura Evolutiva?)
+- Modularidade e Acoplamento
+        É preciso pensar em uma arquitetura que defina bem seus componentes com limites bem especificados.
+- Organizado através das capacidades do negócio
+        Há mais registros de sucesso com arquiteturas que voltaram sua modularidade de acordo com o negócio, inspiradas por Domain Driven Design. Essa é uma das principais diferenças entre Microsserviços e SOA. SOA divide-se em camadas técnicas, enquanto Microsseviços divide a aplicação em camadas de negócio.
+- Experimentação
+        É uma das principais características que uma Evolutionary Architecture proporciona. Ela permite que você utilize técnicas como A/B testing eCanary Releases.
+

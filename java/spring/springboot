@@ -26,4 +26,140 @@ Using YAML
         To set multiple profiles in YAML, use spring.profiles attribute.
         YAML CAN'T be loaded using @PropertySource annotation. To load values that way, you will need a properties file.
 
-STOPPED AT: Type safe config properties.
+24.7 Type-safe Configuration Porperties
+@Value("${property}") é usada para injetar propriedades de configuração.
+
+@EnableConfigurationProperties is automatically applied to your project so that any beans annotated with @ConfigurationProperties will be configured from the Environment properties. This style of configuration works particularly well with the SpringApplication external YAML configuration:
+
+# application.yml
+
+connection:
+        username: admin
+        remoteAddress: 192.168.1.1
+
+# additional configuration as required
+
+To work with @ConfigurationProperties beans you can just inject them in the same way as any other bean.
+
+@Service
+public class MyService {
+        
+        @Autowired
+        private ConnectionSettings connection;
+
+        @PostConstruct
+        public void openConnection() {
+                Server server = new Server();
+                this.connection.configure(server);
+        }
+}
+
+Um atalho para registrar as definições de registro de @ConfigurationProperties é listar as classes de propriedades diretamente na anotação @EnableConfigurationProperties
+@Configuration
+@EnableConfigurationProperties(ConnectionSettings.class)
+public class MyConfiguration {
+}
+
+Quando o bean do @ConfigurationProperties for registrado assim, o bean terá um nome seguindo a convenção <prefixo>-<fqn>, onde <prefixo> é o prefixo da chave de ambiente especificada na anotação @ConfigurationProperties e <fqn> é o o nome completamente qualificado do bean. Se a anotação não provê nenhum prefixo, apenas o nome completamente qualificado do bean será usado.
+O nome do bean do exemplo acima será connection-com.example.ConnectionSettings, assumindo que o COnnectionSettings fica no pacote com.example.
+
+Usar o @ConfigurationProperties também permite que você gere arquivos de meteadados que possam ser usados por IDEs.
+
+Se for necessário fazer conversão personalizada de tipo de dados do arquivo de propriedades, ocê pode definir um bean ConversionService, ou editores dep ropriedades personalizados (CustomEditorConfigurer) ou Converters personalizaos (com definições de bean anotadas como @ConfigurationPropertiesBinding)
+
+25. Profiles
+é um jeito de separar partes da configuração de uma aplicação e disponibilizá-las apenas para certos ambientes. Um @Componente ou @Configuration pode ser marcado com @Profile, pra definir quando ele deve ser carregado.
+Pra definir quais ambientes estão ativos, pode-se fazer:
+spring.profiles.active = dev, hsqldb
+ou por argumento de linha de comando, com --spring.profiles.active = dev, hsqldb.
+
+spring.profiles: prod
+spring.profiles.include: proddb, prodmq
+
+26. Logging
+Configurações padrão são providenciadas para o Java Util Logging, Log4J2 e Logback. 
+O padrão pai de oodos é que se use Logback. 
+
+O padrão de formato dos logs tem as seguintes informações: timestamp, nível de log (error, warn, info, debug, drace), o ID do processo, um separador, o nome da thread, o nome do logger e a log message.
+
+Você pode forçar o spring a usar um sistema de log usando a propriedade org.springframework.boot.logging.LoggingSystem. As opções para ela são Logback, Log4j2 ou JDK.
+
+27. Developing Web Applications
+@Controller e @Restontroller são anotaçòes que criam beans para lidar com HTTP Requests. Os métodos do controller são mapeados para HTTP usando anotações @RequestMapping
+Exemplo
+
+@RestController
+@RequestMapping(value="/users")
+public class MyRestController {
+        @RequestMapping(value="/{user}", method=RequestMethod.GET)
+        public User getUser(@PathVariable Long user) {
+        }
+
+        @RequestMapping(value="/{user}/customers", method=RequestMethod.GET)
+        public List<Customer> getUserCustomers(@PathVariable Long user) {
+        }
+
+        @RequestMapping(value="/{user}", method=RequestMethod.DELETE)
+        public User deleteUser(@PathVariable Long user) {
+        }
+}
+
+Spring MVC auto-configuration.
+        SpringBoot gera várias coisas automaticamente, além dos padrões que o SPRING dá:
+        ContentNegotiatingViewResolver e BeanNameViewResolver beans;
+        Suporte a servir recursos estáticos, incluindo suporte para WebJars
+        Registro automatico de COnverter, GenericConverter e Formatters,
+        Suporte a HttpMessageConverters
+        Registro autometico de MessageCodesResolver
+        Suporte a index.html estático
+        Suporte a um Favicon padrão
+        Uso automático de um ConfigurableWebBindingInitializer
+
+Se quiser ter controle completo do Spring MVC, você pode adicionar seu próprio @Configuration anotado com @EnableWebMvc. Se você quiser manter as features citadas acima, apenas adicionando mais configurações, você pode adicionar seus próprios @Beans do tipo WebMvcConfigurerAdapter, mas SEM@EnableWebMvc.
+
+HttpMessageConverters
+        É uma interface que o Spring MVC usa para converter requests e responses HTTP. Padrões sensíveis são incluídos por padrão, como por exemplo, Objetos podem ser convertidos automaticamente para JSON (usando Jackson) ou XML (usando Jackson XML se houver, senão usando JAXB). Strings são encodadas usando o padrão UTF-8.
+        Se você precisar adicionar ou customizar conversores você deve usar a classe HttpMessageConverters.
+Exemplo:
+import org.springframework.boot.autoconfigure.eb.HttpMesageConverters;
+import org.springframework.context.annotation.*;
+import org.springframework.http.converter.*;
+
+@Configuration
+public class MyConfiguration {
+        @Bean
+        public HttpMessageConverters customConverters() {
+                HttpMessageConverter<?> additional = ...
+                HttpMessageConverter<?> another = ...
+                return new HttpMessageConverters(additional, another);
+        }
+}
+
+-> Custom JSON Serializers and Deserializers (JsonSerializer, @JsonComponent) or JsonObjectSerializer JsonObjectDeserializer.
+
+-> MessageCodesResolver - Estratégia de geração de códigos de erro. O Spring Boot cria um pra você se você setar spring.mvc.message-codes-resolver.format PREFIX_ERROR_CODE ou POSTFIX_ERROR_CODE.
+
+-> Conteúdo Estático (27.1.5)
+        Por padrão, o Spring Boot vai servir o conteúdo estático de um diretório chamado /static (ou /public, ou /resources, ou ainda /META-INF/resources) no classpath ou da raiz do ServletContext. Ele usa o ResourceHttpRequestHandler do Spring MVC para que você possa modificar aquele comportamento adicionando seu próprio WebMvcConfigurerAdapter e sobreescrever o método addResourceHandlers.
+        É possível customizar a localização do conteúdo estático, colocando o caminho na propriedade spring.resources.staticLocations
+        Há um caso de tratamento especial para conteúdo de WebJars. Quaisquer recursos que estiverem em /webjars/** serão servidos dos arquivos jar que estiverem empacotados no formato Webjar.
+        Há uma forma de definir que algumas partes do conteúdo estático que são carregados na aplicação de forma versionada. Por exemplo, se quisermos que o conteúdo javascript localizado em /js/lib seja carregado sempre em uma versão específica, enquanto o resto do conteúdo é carregado o mais atual, podemos usar:
+        spring.resources.chain.strategy.content.enabled=true
+        spring.resources.chain.strategy.content.paths=/**
+        spring.resources.chain.strategy.fixed.enabled=true
+        spring.resources.chain.strategy.fixed.paths=/js/lib/
+        spring.resources.chain.strategy.fixed.version=v12
+
+-> ConfigurableWebBindingInitializer
+        O Spring MVC utiliza um WebBindingInitializer para inicializar o WebDataBinder para um request. Se você criar seu próprio bean ConfigurableWebBindingInitializer, o Spring Boot vai automaticamente configurar o Spring MVC para utilizá-lo.
+
+-> Template Engines (27.1.7)
+        O Spring MVC também pode ser usado para servir conteúdo HTML dinâmico. O framework tem suporte out of the box para tecnologias como Velocity, FreeMarker e JSPs. Outras tecnologias possuem suas prórpias integrações com o Spring, mas o Spring-boot tem configuração automática para as seguintes tecnologias:
+                - FreeMarker
+                - Groovy
+                - Thymeleaf
+                - Velocity
+                - Mustache
+                Quando você usar as configurações padrão para alguma dessas tecnologias, o conteúdo estático será buscado em src/main/resources/templates
+
+-> Lidando com Erros (27.1.8)

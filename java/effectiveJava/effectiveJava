@@ -3,6 +3,8 @@ ITEMS:
 2. Consider a Builder when facing an object creation with multiple (optional) parameters
 3. Enforce the Singleton property with a private constructor or with an ENUM class
 4. Enforce noninstantiability with a private constructor
+5. Avoid creating unnecessary objects
+6. Eliminate obsolete object references
 
 Consider static factory methods instead of constructors.
 example: 
@@ -63,3 +65,46 @@ public class UtilityClass {
                 throw new AssertionError();
         }
         ... // Remainder omitted
+
+5. AVOID CREATING UNNECESSARY OBJECTS
+        É geralmente mais apropriado reutilizar um único objeto ao invés de criar um objeto novo com funcionalidades equivalentes cada vez que isso é preciso. Reutilização pode ser tanto mais rápida quanto mais estilosa. Um objeto pode sempre ser reutilizado se for imutável (15)
+        Como um exemplo extremo do que NÃO fazer, temos:
+        String s = new String("stringette"); // DON'T DO THIS!
+
+        O comando acima cria uma nova instância de String sempre que for executado, e nenhuma criação de objeto é necessária. O argumento para o construtor da string "stringette" já é uma instância de String, cuja funcionalidade é idêntica a todos os objetos criados por esse construtor. Se esta utilização ocorre em um loop ou em um método frequentemente invocado, milhões de instâncias de String podem ser criadas sem necessidade.
+        A versão melhorada é simplesmente a seguinte:
+        String s = "stringette";
+
+        Esta versão utiliza uma única instância de String, ao invés de criar uma nova toda vez que for executada. Além do mais, é garantido que o objeto será reutilizado por qualquer outro código rodando na mesma máquina virtual que contém o mesmo literal String  que contiver o mesmo literal String.
+        Você pode geralmente evitar criar objetos desnecessários utilizando métodos de factory estáticos (1) ao invés de construtores, em classes imutáveis que disponibilizem dois. Por exemplo, o método Boolean.valueOf(String) é quase sempre preferível ao invés do construtor Boolean(String). O construtor cria um novo objeto sempre que for chamado, enquanto a factory estática nunca precisa fazê-lo e não o vai, na prática.
+        Adicionalmente a reutilização de objetos imutáveis, você tabém pode reutilizar objetos mutáveis se você sabe que eles não serão modificados. Aqui há um exemplo um pouco mais sutil e muito mais comum do que não fazer. Ele envolve objetos Date mutáveis que nunca são modificados uma vez que forem computados. Essa classe modela uma pessoa e tem um método isBabyBoomer que diz se a pessoa é um "baby boomer", ou seja, em outras palavras ,se a pessoa nasceu entre 1946 e 1964:
+
+        public class Person {
+                private final Date birthDate;
+
+                // Outros campos, métodos e construtor omitidos
+
+                // NÃO FAÇA ISSO
+                public boolean isBabyBoomer() {
+                        // alocação desnecessária de um objeto caro
+                        Calendar gmtCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                        gmtCal.set(1946, Calendar.JANUARY, 1, 0, 0, 0);
+                        Date boomStart = gmtCal.getTime();
+                        gmtCal.set(1965, Calendar.JANUARY, 1, 0, 0, 0);
+                        Date boomEnd = gmtCal.getTime();
+                        return birthDate.compareTo(boomStart) >= 0 && birthDate.compareTo(boomEnd) < 0;
+                }
+        }
+        O método isBabyBoomer criou desnecessariamente um novo Calendar, TimeZone e duas instâncias de Date cada vez que é invocada. A versão que segue evita essa inefiiência com um inicializador estático:
+
+6. ELIMINATE OBSOLETE OBJECT REFERENCES
+        Quando a gente vem de linguagens onde somos obrigados a lidar com gerenciamento da memória, como C e C++, nos acostumamos a deletar os objetos que criamos. Em linguagens como o Java, que possuem um Garbage Collector, às vezes não entendemos propriamente seu funcionamento e esperamos que a "mágica" aconteça sempre que não usamos mais um objeto. Isso é verdade para grande parte dos casos, mas existem momentos onde o Garbage Collector não consegue saber se deve ou não deletar uma instância de objeto e, com o tempo, a aglomeração desses objetos que ficam no "limbo" irão diminuir a performance da aplicação que está rodando. Os casos mais comuns são os seguintes:
+
+When a Class manages its own memory, the programmer should be alert for memory leaks.
+        Um exemplo que o livro dá é quando usamos um array de tamanho variável como uma pilha e, quando usamos "pop", diminuimos o tamanho do array e retornamos o resultado do valor que estava na ponta. Como não explicitamente definimos que, naquela posição do array, não queremos mais a instância do objeto que foi "popped", o Garbage Collector não sabe que aquele objeto não será mais utilizado e o mantém.
+Another common source of memory leaks is caches.
+        A argumentação está no fato de que, por ser um hashmap, é muito comum esquecermos de apagar essa relação entre objetos e a cache, fazendo com que ela fique guardando vários dados obsoletos.
+A third common source of memory leaks is listeners and other callbacks.
+        Se você implementar uma API onde os clientes registram callbacks e não as desregistram explicitamente, elas irão acumular a não ser que você faça algo sobre isso. Uma solução é armazenar apenas referências fracas (weak references) delas, usando por exemplo um WeakHashMap.
+
+

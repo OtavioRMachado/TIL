@@ -163,3 +163,107 @@ public class MyConfiguration {
                 Quando você usar as configurações padrão para alguma dessas tecnologias, o conteúdo estático será buscado em src/main/resources/templates
 
 -> Lidando com Erros (27.1.8)
+        O spring-boot, por padrão, cria um endpoint /error que lida com erros graciosamente. Para clientes-máquina, ele irá produzir um JSON com os detalhes do erro, o HTTP Status e a mensagem de exception, enquanto que para clientes browser ele irá gerar um HTML com as mesmas informações. 
+        Para substituir o comportamento padrão completamente, pode-se implementar o ErrorController ou adicionar um bean do tipo ErrorAttributes para utilizar o mesmo mecanismo, mas substituir o seu conteúdo.
+        Dica: Pode-se usar o BasicErrorController como base para um ErrorController personalizado. 
+        Também há formas de ter um ErrorHandler para algum pacote específico da aplicação, ou páginas personalizadas para serem retornadas quando há algum erro, como 404, 403 e tal.
+
+-> Spring HATEOAS - Hypermedia as the Engine of Application State (27.1.9)
+
+O que é HATEOAS?
+        É uma limitação da arquitetura REST que a diferencia das outras arquiteturas de rede. Se baseia no princípio de que um cliente interage com uma aplicação de rede inteiramente através da hipermídia providenciada dinamicamente pelos servidores de aplicação. Um cliente REST não precisa de nenhum conhecimento prévio sobre como interagir com qualquer aplicação ou servidor em particular além de ter um conhecimento genérico de hipermídias. 
+
+O Spring-Boot provê autoconfiguração para HATEOAS que funciona bem com quase todo tipo de aplicações. Com a autoconfiguração não se torna mais necessário usar @EnableHypermediaSupport e registrar um número de beans para facilitar a construção de aplicações baseadas em hipermídia, incluindo um LinkDiscoverers e um ObjectMapper configurado para parsear respostas na representação desejada.
+
+Você pode controlar a configuração do HATEOAS no Spring utilizando a anotação @EnableHypermediaSupport.
+
+-> Suporte a CORS (27.1.10)
+        CORS - Cross-Origin resource sharing é uma especificação da W3C implementada por grande parte dos browsers que te permite especificar, de uma forma flexúvel, que tipo de requisições cross-domain estão autorizadas, ao invés de utilizar outros approaches menos seguros e poderosos, como IFRAME e JSONP.
+        Desde a versão 4.2, o Spring MVC suporta o CORS. Não é necessário adicionar nenhuma configuração específica utilizando @CrossOrigin annotations no SpringBoot. A configuração global de CORS pode ser definida ao registrar um bean WebMvcConfigurer com um método personalizado addCorsMappings(CorsRegistry)
+
+-> JAX-RS e Jersey (27.2)
+        Se você preferir o modelo de programação JAX-RS para endpoints REST, você pode usar uma das implementações disponíveis ao invés do Spring MVC. Jersey 1.x e Apacher CXF funcionam por padrão muito bem se você registrar seus Servlet ou Filter como @Beans do contexto da sua aplicação. Jersey 2.x já veio com algum suporte nativo a Srping, então nós também providenciamos autoconfigurações no Srpingboot, junto com um starter para ele. 
+        Para usar Jersey 2.x, apenas inclua spring-boot-starter-jersey como uma dependência e então você só precisará de um @Bean do tipo ResourceConfig que é onde você registrará todos seus endpoints.
+
+@Component
+public class JerseyConfig extends ResourceConfig {
+        
+        public JerseyConfig() {
+                register(Endpoint.class);
+        }
+}
+
+Você também pode registrar um número qualquer de beans implementando o ResourceConfigCustomizer para personalizações mais avançadas.
+Todos os endpoints registrados devem ser @Components com anotações de recursos HTTP (como @GET), exemplo:
+
+@Component
+@Path("/hello")
+public class Endpoint {
+        @GET
+        public String message() {
+                return "Hello";
+        }
+}
+
+-> Suporte a container de Servlet embutido
+        SpringBoot dá suporte para servidores Tomcat, Jetty e Undertow. Grande parte dos desenvolvedores simplesmente usará o Starter POM apropriado par aobter uma instância completamente configurada. Por padrão, o servidor embutido irá ouvir os HTTP requests na porta 8080.
+
+-> Servlets, Filters e listeners (27.3.1)
+
+Registrar Servlets, Filters e listeners como beans do Spring
+        Qualquer instância que for um Spring bean será registrada no container embutido. Isso pode ser conveniente se você quiser se referir a um valor do seu application.properties durante a configuração.
+        Por padrão, o contexto só tem um único servlet que é mapeado para o /. No caso dem ultiplos Servlet beans, o nome do bean será usado como um prefixo do path. Filters serão mapeados para /*
+        Se isso não for flexível o suficiente, pode-se usar ServletRegistrationBean, FilterRegistrationBean e ServletListenerRegistrationBean para controle completo deles.
+
+-> Inicialização do contexto de um Servlet (27.3.2)
+        Para servlets embutidos, o Spring não vai executar automaticamente a interface ServletContainerInitializer, ou a interface WebApplicationInitializer do Spring. Isso foi feito para reduzir o risco de que bibliotecas externas que foram feitas pra rodar dentro de um war quebrem as aplicações Spring Boot. Se for necessário realizar a inicialização do contexto de um Servlet, você pode registrar um bean que implemente a interface ServletContextInitializer.
+
+-> Escanear Servlets, Filters e Listeners
+        Quando usar um container embutido, o registro automático de classes anotadas com @WebServlet, @WebFilter, @WebListener pode ser habilitado usando @ServletComponentSCan.
+
+-> O EmbeddedWebApplicationContext (27.3.3)
+        É um novo tipo de ApplicationContext para apoiar servlet containers embutidos. É um tipo especial de WebApplicationContext que se inicializa buscando por um bean EmbeddedServletContainerFactory. Jetty, Tomcat ou Undertow estarão autoconfigurados.
+
+-> Customizando embedded servlet containers (27.3.4)
+        Suas configuraçòes podem ser colocadas nas propriedades de ambiente do Spring (application.properties).
+        Configurações comuns são:
+        - Configurações de Rede: Porta para ouvir HTTP requests (server.port), endereço de interface para ligar-se a server.address, etc.
+        - Configurações de Sessão: Se a sessão é persistente ou não (server.session.persistence), timeout de sessão (server.session.timeout), localização dos dados de sessão (server.session.store-dir) e configuração session-cookie (server.session.cookie.*)
+        - Gerenciamento de erros: Localização da página de erro (server.error.path), etc
+        - SSL
+        - Compressão HTTP
+        O SpringBoot tenta expor as configurações em comum, mas isso não é sempre possível. Para estes casos, há namespaces dedicados para customizações específicas de um servidor (veja server.tomcat e server.undertow).
+
+        Customização de forma programática
+        Você pode registrar um bean do Spring que implemente a interface EmbeddedServletContainerCustomizer.
+
+        Customização diretamente do ConfigurableEmbeddedServletContainer
+        Você pode registrar o bean TomcatEmbeddedServletContainerFactory / Jetty... / Undertow... você mesmo.
+
+        Setters provêem muitas opções de configuração.
+
+-> Limitações do JSP
+        Quando rodar uma aplicação Spring que usa um embedded servlet container (e estiver empacotado como um arquivo executável), há algumas limitações no suporte a JSP.
+        - Com o TomCat deve funcionar se você utilizar empacotamento war. Um jar não irá funcionar por causa de um padrão de arquivos hard coded no Tomcat
+        - Jetty não funciona como um container embutido com JSPs
+        - Undertow não suporta JSPs
+        Há um exemplo de JSPs para você ver como configurar as coisas.
+
+----------------------> SEGURANÇA 
+        Se "Spring Security" estiver no seu classpath, então as aplicações web estarão seguras por padrão com autenticação básica em todos os endpoints HTTP. Para adicionar segurança a nível de métodos a uma aplicação web, é possível adicionar @EnableGlobalMethodSecurity às suas configurações desejadas. Mais informações podem ser encontradas no manual de referência de Segurança do Spring.
+        O AuthenticationManager padrão tem um único usuário (Onde o nome do usuário é 'user' e o password é aleatório, impresso a nível de INFO quando a aplicação começa a rodar)
+
+        Você pode mudar esta senha provendo um security.user.password.
+        A implementação das configurações padrão acontece em SecurityAutoConfiguration a nas classes importadas dela (SpringBootWebSecurityConfiguration, AuthenticationManagerConfiguration). Para desligar o padrão, adicione um bean com @EnableWebSecurity (Isso não desabilita o AuthenticationManagerConfiguration). Para customizá-lo geralmente se usam properties externas e beans do tipo WebSecurityConfigurerAdapter (por exemplo, pra adicionar login baseado em forms). Para desligar tudo, adicione um bean do tipo AuthenticationManager ou configure o AuthenticationManager autowiring um AuthenticationManagerBuilder em um método de uma das suas classes @Configuration.
+
+        As funcionalidades que você ganha de botija em uma aplicação web são:
+        - Um bean AuthenticationManager com armazenamento em memória e um único usuário (veja SecurityProperties.user para as propriedades do usuário)
+        - Caminhos ignorados (inseguros) para localizações de recursos estáticos (/css/**, /js/**, /images/**, ...)
+        - Segurança básica para todos os endpoints HTTP
+        - Eventos de segurança publicados no ApplicationEventPublisher do Spring (autenticações com sucesso, sem sucesso e acesso negado)
+        - Funcionalidades comuns de baixo nível (HSTS, XSS, CSRF, caching) providas pelo Spring Security são ativadas por padrão.
+        Mas todas acima podem ser ligadas ou desligadas usando propriedades externas (security.*). Para sobrescrever as regras de acesso sem mudar qualquer outra funcionalidade autoconfigurada adicione um bean do tipo WebSecurityConfigurerAdapter com @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER).
+
+-> OAuth2 (28.1)
+
+        

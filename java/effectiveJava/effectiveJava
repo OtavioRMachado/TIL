@@ -5,6 +5,8 @@ ITEMS:
 4. Enforce noninstantiability with a private constructor
 5. Avoid creating unnecessary objects
 6. Eliminate obsolete object references
+7. Avoid finalizers
+8. Obey the general contract when overriding equals
 
 Consider static factory methods instead of constructors.
 example: 
@@ -106,5 +108,42 @@ Another common source of memory leaks is caches.
         A argumentação está no fato de que, por ser um hashmap, é muito comum esquecermos de apagar essa relação entre objetos e a cache, fazendo com que ela fique guardando vários dados obsoletos.
 A third common source of memory leaks is listeners and other callbacks.
         Se você implementar uma API onde os clientes registram callbacks e não as desregistram explicitamente, elas irão acumular a não ser que você faça algo sobre isso. Uma solução é armazenar apenas referências fracas (weak references) delas, usando por exemplo um WeakHashMap.
+
+7. AVOID FINALIZERS
+        Finalizers são difíceis de se prever, geralmente perigosos e geralmente desnecessários.
+        Em Java, pode levar um tempo longo entre o momento em que um objeto não é mais alcançavel até o seu finalizer ser executado. Isso significa que você nunca deve fazer nada que seja time-critical em um finalizer.
+        If an uncaught exception is thrown in a Finalizer, the exception is ignored and the finalization terminates. This can leave objects in a corrupt state.
+        It takes a long time to use objects with finalizers. (About 430 times slower)
+        You have to explicitly call finalize methods from superclasses.
+        What is it good for? 
+        - Guaranteeing freeing of resources (better impredictabily late than never) if someone forgets to, but remember to log a warning. 
+        - It's good for deleting native peers (objects that the original object delegates things to)
+
+8. OBEY THE GENERAL CONTRACT WHEN OVERRIDING EQUALS
+        É, geralmente, bem fácil fazer um override do Equals que dá errado. Por isso, a sugestão inicial é: não faça override. Essa sugestão se aplica aos seguintes casos:
+        - Cada instância da sua classe é inerentemente única;
+        - Você não se importa se a classe provê um teste de igualdade lógica;
+        - Uma superclasse já substituiu o equals e o comportamento dela é apropriado para esta classe;
+        - A classe é privada ou privada para um pacote, e você tem certeza que seu método equals nunca será chamado.
+        (neste caso, talvez o melhor seja dar override e dar throw numa exceção lá dentro)
+
+        Ou seja, em grande parte, o equals deve ser sobrescrito para "value objects". E, para isso, é importante seguir o contrato do equals:
+        Ele implementa uma relação de equivalência. Ela é:
+        - Reflexiva: Para qualquer referência não null x, x.equals(x) PRECISA retornar true;
+        - Simétrica: Para quaisquer referências não-null x e y, x.equals(y) deve retornar true se e somente se y.equals(x) retornar true;
+        - Transitiva: Para quaisquer referências não null x, y e z, se x.equals(y) = true e y.equals(z) = true, então x.equals(z) deve ser true;
+        - COnsistente: Múltiplas invocações de x.equals(y) devem sempre retornar ou true ou false.
+        - Para qualquer referência não-null x, x.equals(null) deve retornar falso.
+        
+        Há uma lista de coisas para se pensar para um método equals de boa qualidade
+        1. Use o operador == para checar se o argumento é uma referência a este objeto.
+        2. Use instanceof para chegar se o argumento tem o tipo certo.
+        3. Transforme o argumento para o tipo correto
+        4. Para cada campo significativo da calsse, verifique se o valor dele no argumento é igual ao do campo deste objeto
+        5. Quando terminar de escrever o equals, pergunte-se: é simétrico? É transitivo? É consistente?
+
+        - Sempre sobrescreva hashcode quando sobrescrever equals;
+        - Não tente ser um espertinho
+        - Não substitua outro tipo por Object na declaração do equals
 
 

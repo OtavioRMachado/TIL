@@ -14,3 +14,42 @@ Stakeholders: Cliente, usuários finais, desenvolvedores, gerentes de projeto, m
 
 (Parei em 1.2)
 
+"Software Process" é o termo dado à organização, ritualização e gerenciamento de atividades de desenvolvimento de software. Que atividades estão envolvidas na criação de uma arquitetura de software, usando aquela arquitetura para gerar um formato, e então implementar ou gerenciar a evolução do sistema-alvo ou aplicação? Estas atividades incluem o seguinte:
+- Criação do caso de negócio ("Business Case") para o sistema;
+- Entendimento dos requisitos;
+- Criaçãou ou seleção da arquitetura;
+- Documentação e comunicação da arquitetura;
+- Análise ou avaliação da arquitetura;
+- Implementação do sistema baseado na arquitetura;
+- Garantia de que a implementação foi feita conforme a arquitetura;
+
+Atividades de Arquitetura:
+        Como indicado na estrutura do ABC (Architecture Business Cycle), atividades de arquitetura tem relações compreensivas de feedback umas com as outras. Nós introduziremos brevemente cada atividade nas seguintes subseções.
+
+-> Criação do caso de negócio ("Business Case") para o sistema.
+        Criar um caso de negócio é algo mais aberto do que simplesmente assessar a necessidade do mercado pelo sistema. É um passo importante na criação e limitação de qualquer requisito futuro. Quanto deveria custar o produto? Qual é o mercado-alvo? Qual é o tempo definido para que chegue no mercado? Ele terá que comunicar com outros sistemas? Há limitações do sistema com as quais ele precise trabalhar?
+Todas essas são questões que devem envolver os arquitetos de sistema. Elas não podem ser decididas somente pelo arquiteto, mas se um arquiteto não for consultado na criação do caso de negócio, pode se tornar impossível conquistar os objetivos do negócio.
+
+-> Entendimento dos Requisitos
+        Técnicas que podem variar de análise de casos de uso, ou modelos de estado de máquina finitos ou linguagens de especificação formal. (Capítulo 4)
+        Implicações arquiteturais de linhas de produto (Capítulo 14)
+        Alcançando qualidades - Há tradeoffs que não ficam claros antes da definição da arquitetura. (Capítulo 5)
+        Criação de protótipos.
+
+-> Criando ou selecionando a Arquitetura
+        No livro The Mythical Man-Month, Fred Brooks discute que integridade conceitual é a chave do desenho de sistemas de som e que a integridade conceitual pode ser somente alcançada por um pequeno número de mentes se juntando para desenhar a arquitetura do sistema. Os capítulos 5 e 7 mostram como criar uma arquitetura para alcançar seus requisitos comportamentais e de qualidade.
+
+-> Comunicando a Arquitetura
+        Para a arquitetura ser efetiva como a coluna vertebral do desenho do projeto, deve ser comunicada claramente e de forma que não fique ambígua para todos os stakeholders. Os desenvolveores devem entender as tarefas de trabalho que são pedidas deles, os testadores devem entender a estrutura das tarefas que for imposta e eles e a gerência deve entender as implicações de agendamento que ele sugere, e assim vai. Para este fim, a documentação da arquitetura deve ser informativa, não-ambígua, e legível por várias pessoas de backgrounds variados. Discutimos a documentação de arquiteturas no capítulo 9
+
+-> Analisando ou avaliando a arquitetura
+        Em qualquer processo de desenho haverão varios designs sendo considerados. Alguns serão imediatamente rejeitados. Outros irão duelar. Escolher entre estes designas que estão competindo de forma racional é um dos grandes desafios do arquiteto. Os capítulos na parte 3 descrevem métodos para realizar estas decisões
+        Avaliar uma arquitetura pelas qualidades que ela suporta é essencial para garantir que o sistema construído com aquela arquitetura satisfaça as necessidades de seus stakeholders. Tornar-se mais widespread são técnicas de análise apra avaliar os atributos de qualidade que uma arquitetura define no sistema. Técnicas baseadas em cenário provêem uma das mais gerais e efetivas abordagens para avaliar uma arquitetura. A abordagem mais madura metodologicamente é encontrada no ATAM (Método de análise de tradeoffs de uma arquitetura) no capítulo 11, enquanto o CBAM (método de análise de custo-benefício) do capítulo 12 provê um link crítico para as implicações econômicas de decisões arquiteturais.
+
+-> Implementando baseado em uma arquitetura
+        Esta atividade está relacionada a manter os desenvolvedores crentes nas estruturas e nos protocolos de interação limitados pela arquitetura. Ter uma arquitetura explícita e bem-comunicada é o primeiro passo em dira'eção a garantir uma conformação arquitetural. Ter um ambiente ou infraestrutura que ativamente ajude desenvolvedores a criar e manter a arquitetura (ao contrário de somente o código) é melhor.
+
+-> Garantindo conformidade para uma arquitetura
+        Finalmente, quando uma arquitetura é criada e usada, ela vai para a fase de manutenção. Vigilância constante é necessária para garantir que a arquitetura e sua representação continue fiel uma à otura durante esta fase. Embora o trablaho nesta área seja completamente imaturo, há intensa atividade nso últimos anos O cap10 (reconstruindo arqutieturas de software) irá apresentar o estado atual de recuperar uma arquitetura de um sistema já existente e garantir que ele conforma com a arquitetura espec'ificada.
+
+
